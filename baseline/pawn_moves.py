@@ -23,8 +23,6 @@ for ttv in sections:
 					pawn_movesw += 1
 				else:
 					pawn_movesb += 1
-			if even >= 30:
-				break
 		out[p, 0] = pawn_movesw
 		out[p, 1] = pawn_movesb
 		p += 1
