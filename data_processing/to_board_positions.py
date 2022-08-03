@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 np.set_printoptions(threshold = 100000)
-
+# should be a bool array
 def create_start(): # tested and works
     empty = np.zeros((8, 8, 12)) # use 7- to make sure rows and columns line up
     empty[0, 7-4, 0] = 1 #king
