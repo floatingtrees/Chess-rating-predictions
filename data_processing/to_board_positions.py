@@ -3,7 +3,7 @@ import sys
 np.set_printoptions(threshold = 100000)
 # should be a bool array
 def create_start(): # tested and works
-    empty = np.zeros((8, 8, 12)) # use 7- to make sure rows and columns line up
+    empty = np.zeros((8, 8, 12), dtype = bool) # use 7- to make sure rows and columns line up
     empty[0, 7-4, 0] = 1 #king
     empty[0, 7-3, 1] = 1 #queen
     empty[0, 7-0, 2] = 1 #rook 
@@ -43,11 +43,11 @@ while True: # keeps going until your data or storage runs out
         X1 = np.load(f'X_{ttv}.npy', allow_pickle = True)
         X = X1[samples * (count-1):samples * count, 1]
         X1 = 1
-        out = np.zeros((X.shape[0], 8, 8, 12, num_moves)) #rows before columns
+        out = np.zeros((X.shape[0], 8, 8, 12, num_moves), dtype = bool) #rows before columns
         destroy = []
         for i in range(len(X)): # iterates over games in the dataset 
             discard = False
-            positions = np.zeros((1, 8, 8, 12, num_moves))
+            positions = np.zeros((1, 8, 8, 12, num_moves), dtype = bool)
             game = X[i]
             moves = game.split()
             moves = moves[:num_moves]
