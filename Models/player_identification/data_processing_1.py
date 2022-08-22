@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import sys
 
+# Create a folder call people_groups
 x = pd.read_csv("testing.csv", sep='delimiter', header=None, engine = 'python', on_bad_lines='warn')
 print("loaded")
 arr = np.array(x)
