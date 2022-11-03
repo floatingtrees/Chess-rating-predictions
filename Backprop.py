@@ -2,6 +2,8 @@ import numpy as np
 import pickle
 import time
 
+#first is number of rows, then columns
+
 def sigmoid(z): # Good
     s = 1/(1+np.exp(-z))
     return s
@@ -22,7 +24,7 @@ def initialize(input_dim, neurons, L): # Good
     
     return parameters
 
-def propagate(parameters, L, X, Y): 
+def propagate(parameters, L, X, Y, test = False): 
     parameters['a0'] = X
     parameters['z1'] = np.matmul(X.T, parameters["W1"]) + parameters['b1'] 
     parameters['a1'] = relu(parameters['z1'])
@@ -32,6 +34,8 @@ def propagate(parameters, L, X, Y):
     parameters['z' + str(L)] = np.matmul(parameters['a' + str(L - 1)], parameters['W' + str(L)]) + parameters['b' + str(L)]
     parameters['a' + str(L)] = sigmoid(parameters['z' + str(L)])
     cost = -np.sum(np.multiply(Y.T, np.log(parameters['a' + str(L)])) + np.multiply((1-parameters['a' + str(L)]), 1-Y.T))/Y.shape[1]
+    if test:
+        print("\nTest accuracy: \n")
     print("Cost: ", cost)
     accuracy = (1 - (np.sum(np.abs(Y - np.around(parameters['a' + str(L)]).T)))/Y.shape[1]) * 100
     print("Accuracy", accuracy)
@@ -68,47 +72,47 @@ def update(parameters, learning_rate, L):
 def optimize(parameters, L, X, Y, num_iterations, learning_rate):
     costs = []
     cd = []
-    for i in range(num_iterations):
-        parameters, cost = propagate(parameters, L, X, Y)
-        costs.append(cost)
-        print(parameters["a" + str(L)].shape)
-        parameters = backpropagate(parameters, L, Y)
-        parameters = update(parameters, learning_rate, L)
-        learning_rate -= learning_rate/(num_iterations + 1)
-    for i in range(num_iterations - 1):
-        cd.append(costs[i - 1] - costs[i])
-    print(cd)
-    return parameters
+    try:
+        for i in range(num_iterations):
+            parameters, cost = propagate(parameters, L, X, Y)
+            costs.append(cost)
+            parameters = backpropagate(parameters, L, Y)
+            parameters = update(parameters, learning_rate, L)
+        for i in range(num_iterations - 1):
+            cd.append(costs[i - 1] - costs[i])
+        print(cd)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        return parameters
 
 def model(neurons, X_train, Y_train, X_test, Y_test, num_iterations, learning_rate):
     L = len(neurons)
     parameters = initialize(X_train.shape[0], neurons, L)
     parameters = optimize(parameters, L, X_train, Y_train, num_iterations, learning_rate)
-    propagate(parameters, L, X_test, Y_test)
+    propagate(parameters, L, X_test, Y_test, test = True)
 
     return parameters
 
 start = time.time()
-# Data shaped in (num_features, num_examples) 
+# Data shapes line up
 X_train = np.load('X_train_confirmed.npy') / 255
 Y_train = np.load('Y_train_confirmed.npy')
 X_test = np.load('X_test_confirmed.npy') / 255
+print(X_train.shape, X_test.shape)
 Y_test = np.load('Y_test_confirmed.npy')
 
 neurons = [64, 16, 1]
 print("\n PROGRAM STARTING \n")
-try:
-    parameters = model(neurons, X_train, Y_train, X_test, Y_test, num_iterations = 300, learning_rate = 0.05)
-    end = time.time()
-    print("Runtime: ", end - start)
 
-    f = open("deep_parameters_inv.pkl","wb")
 
-    pickle.dump(parameters,f)
+parameters = model(neurons, X_train, Y_train, X_test, Y_test, num_iterations = 300, learning_rate = 0.05)
+end = time.time()
+print("Runtime: ", end - start)
 
-    f.close()
-except KeyboardInterrupt:
-    pass
 
+f = open("deep_parameters_inv.pkl","wb")
+pickle.dump(parameters,f)
+f.close()
 
 
